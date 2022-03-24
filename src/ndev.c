@@ -39,15 +39,11 @@ uint8_t nopen(char *filespec, uint8_t mode, uint8_t translation) {
 	OS.dcb.daux2=translation;
 	siov();
 	
-	if (OS.dcb.dstats!=1)
-    {
-		if (OS.dcb.dstats==144) {
-			init_sio();
-			siov();
-			err = OS.dvstat[3];
-		} else {
-			err = OS.dcb.dstats;
-		}
+    err = OS.dcb.dstats;
+    if (err==144) {
+        init_sio();
+        siov();
+        err = OS.dvstat[3];
     }
 	return err;
 }
