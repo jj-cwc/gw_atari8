@@ -7,7 +7,10 @@ typedef struct {
     uint8_t error;
 } nstatus_t;
 
-void init_sio();
+bool ndev_init();
+void ndev_dest();
+bool is_connected();
+bool data_available();
 uint8_t nstatus(nstatus_t *status);
 uint8_t nopen(char *filespec, uint8_t mode, uint8_t translation);
 uint8_t nclose();
