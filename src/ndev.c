@@ -6,15 +6,20 @@
 #include "sio.h"
 #include "ndev.h"
 
+// interrupt handler related stuff
 uint8_t trip;
-uint16_t data_available;
+void *old_vprced; // the old PROCEED vector
+bool old_enabled; // old interrupt state
+extern void ih(); // new interrupt handler
+
+uint16_t bytes_waiting;
 char *buffer;
 nstatus_t *status;
 
 bool ndev_init() {
     uint8_t err;
     
-    data_available = 0;
+    bytes_waiting = 0;
     
     // allocate a text buffer
     buffer = (char *)malloc(128);
@@ -37,7 +42,29 @@ bool ndev_init() {
         return false;
     }
     
+    // set up PROCEED interrupt handler
+    old_vprced  = OS.vprced;
+    old_enabled = PIA.pactl & 1;
+    PIA.pactl  &= (~1);
+    OS.vprced   = ih;
+    PIA.pactl  |= 1;
+    
+    err = nopen(GW_URL, 12, 3);
+    if(err != 1) {
+        ndev_dest();
+        return false;
+    }
+    
     return true;
+}
+
+void ndev_dest() {
+    nclose();
+    free(buffer);
+    free(status);
+    PIA.pactl &= ~1;
+    OS.vprced=old_vprced; 
+    PIA.pactl |= old_enabled; 
 }
 
 bool is_connected() {
@@ -46,11 +73,6 @@ bool is_connected() {
 
 bool data_available() {
     return (trip!=0);
-}
-
-void ndev_dest() {
-    free(buffer);
-    free(status);
 }
 
 uint8_t nstatus(nstatus_t *status) {

@@ -1,6 +1,8 @@
 #ifndef NDEV_H
 #define NDEV_H
 
+#define GW_URL "N:TELNET://gw-dev:4000"
+
 typedef struct {
     uint16_t bytes;
     uint8_t connected;

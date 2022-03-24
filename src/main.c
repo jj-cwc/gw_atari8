@@ -10,7 +10,12 @@ int main(int argc, char* argv[]) {
 	if(!ndev_init()) {
         cputs("FujiNet initialization error.");
     } else {
-        cputs("FujiNet initialization successful.");
+        cputs("FujiNet initialization successful.\r\n");
+        if(is_connected()) {
+            cputs("Connected.");
+        } else {
+            cputs("Not connected.");
+        }
         ndev_dest();
     }
     
