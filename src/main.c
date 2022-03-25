@@ -4,13 +4,13 @@
 #include <stdbool.h>
 #include <conio.h>
 #include "ndev.h"
-#include "output.h"
+#include "ui.h"
 
 int main(int argc, char* argv[]) {
     uint8_t err;
     char *buffer = (char *)malloc(1024);
     
-    output_init();
+    ui_init();
 	if(!ndev_init()) {
         output_display("FujiNet init error.\n");
     } else {
@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
             output_display("No data available.");
         }
         ndev_dest();
+        ui_dest();
         free(buffer);
     }
     

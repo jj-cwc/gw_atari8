@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "output.h"
+#include "ui.h"
 
 bool done = false;
 uint8_t cursor_x, cursor_y; // virtual coordinates of cursor
@@ -18,7 +18,7 @@ void restore_cursor() {
     gotoxy(old_x, old_y);
 }
 
-void output_init() {
+void ui_init() {
     uint8_t y;
     
     save_cursor();
@@ -34,6 +34,9 @@ void output_init() {
     cursor_y = UPPER_MARGIN;
     ostatus_init();
     pstatus_init();
+}
+
+void ui_dest() {
 }
 
 void output_clear() {

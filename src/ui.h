@@ -1,5 +1,5 @@
-#ifndef OUTPUT_H
-#define OUTPUT_H
+#ifndef UI_H
+#define UI_H
 
 #define OUTPUT_WIDTH 32  // 32-column output in case Adam or Spectrum clients join the fray 
 #define LEFT_MARGIN  4  
@@ -8,7 +8,8 @@
 #define OUTPUT_STATUS 22 // A status bar for the output area
 #define PLAYER_STATUS 0
 
-void output_init();
+void ui_init();
+void ui_dest();
 void output_clear();                // clear the output area
 void output_display(char *text);    // display text in the output area
 void output_done();                 // clear before next display
