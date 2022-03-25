@@ -75,6 +75,11 @@ bool data_available() {
     return (trip!=0);
 }
 
+void nreset() {
+    trip=0;
+    PIA.pactl |= 1;
+}
+
 uint8_t nstatus(nstatus_t *status) {
     OS.dcb.ddevic = 0x71;
     OS.dcb.dunit = 1;

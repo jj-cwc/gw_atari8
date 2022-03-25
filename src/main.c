@@ -4,17 +4,18 @@
 #include <stdbool.h>
 #include <conio.h>
 #include "ndev.h"
+#include "output.h"
 
 int main(int argc, char* argv[]) {
-    clrscr();
+    output_init();
 	if(!ndev_init()) {
-        cputs("FujiNet initialization error.");
+        output_display("FujiNet init error.\n");
     } else {
-        cputs("FujiNet initialization successful.\r\n");
+        output_display("FujiNet init successful.\n");
         if(is_connected()) {
-            cputs("Connected.");
+            output_display("Connected.\n");
         } else {
-            cputs("Not connected.");
+            output_display("Not connected.\n");
         }
         ndev_dest();
     }
