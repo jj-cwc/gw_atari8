@@ -49,7 +49,8 @@ void output_clear() {
 }
 
 void output_display(char *text) {
-    int i;
+    uint8_t i;
+    //uint16_t delay;
     
     save_cursor();
     gotoxy(cursor_x, cursor_y);
@@ -58,6 +59,7 @@ void output_display(char *text) {
         done = false;
     }
     
+    gotoxy(cursor_x, cursor_y);
     for(i=0; i<strlen(text); i++) {
         if(text[i] == 0x9B) {
             cursor_x = LEFT_MARGIN;
@@ -74,6 +76,7 @@ void output_display(char *text) {
                 gotox(cursor_x);
             }
         }
+        //for(delay=0; delay<511; delay++);
     }
     restore_cursor();
 }

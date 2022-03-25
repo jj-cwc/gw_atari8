@@ -13,7 +13,6 @@ bool old_enabled; // old interrupt state
 extern void ih(); // new interrupt handler
 
 uint16_t bytes_waiting;
-char *buffer;
 nstatus_t *status;
 
 bool ndev_init() {
@@ -21,23 +20,15 @@ bool ndev_init() {
     
     bytes_waiting = 0;
     
-    // allocate a text buffer
-    buffer = (char *)malloc(128);
-    if(!buffer) {
-        return false;
-    }
-    
     // allocate a status buffer
     status = (nstatus_t *)malloc(sizeof(nstatus_t));
     if(!status) {
-        free(buffer);
         return false;
     }
     
     // check status of FujiNet
     err = nstatus(status);
     if(err != 1) {
-        free(buffer);
         free(status);
         return false;
     }
@@ -60,7 +51,6 @@ bool ndev_init() {
 
 void ndev_dest() {
     nclose();
-    free(buffer);
     free(status);
     PIA.pactl &= ~1;
     OS.vprced=old_vprced; 
@@ -154,7 +144,7 @@ uint8_t nwrite(char *buf, uint16_t len) {
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 'W';
     OS.dcb.dstats = 0x80;
-    OS.dcb.dbuf = OS.dvstat;
+    OS.dcb.dbuf = buf;
     OS.dcb.dtimlo = 0x1f;
     OS.dcb.dbyt = len;
     OS.dcb.daux = len;

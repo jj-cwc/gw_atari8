@@ -7,6 +7,9 @@
 #include "output.h"
 
 int main(int argc, char* argv[]) {
+    uint8_t err;
+    char *buffer = (char *)malloc(1024);
+    
     output_init();
 	if(!ndev_init()) {
         output_display("FujiNet init error.\n");
@@ -17,7 +20,21 @@ int main(int argc, char* argv[]) {
         } else {
             output_display("Not connected.\n");
         }
+        while(!data_available());
+        if(data_available()) {
+            output_display("Data available.\n");
+            err = nread(buffer, 1023);
+            if(err == 1) {
+                output_done();
+                output_display(buffer);
+            } else {
+                output_display("nread() error.\n");
+            }
+        } else {
+            output_display("No data available.");
+        }
         ndev_dest();
+        free(buffer);
     }
     
 	return 0;
