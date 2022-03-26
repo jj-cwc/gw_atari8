@@ -3,15 +3,16 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <conio.h>
-#include "ndev.h"
-#include "ui.h"
+#include "errors.h"
+#include "net.h"
+#include "output.h"
 
 int main(int argc, char* argv[]) {
     uint8_t err;
     char *buffer = (char *)malloc(1024);
     
-    ui_init();
-	if(!ndev_init()) {
+    output_init();
+	if(net_init() != SUCCESS) {
         output_display("FujiNet init error.\n");
     } else {
         output_display("FujiNet init successful.\n");
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
         while(!data_available());
         if(data_available()) {
             output_display("Data available.\n");
-            err = nread(buffer, 1023);
+            err = net_read(buffer, 1023);
             if(err == 1) {
                 output_done();
                 output_display(buffer);
@@ -33,8 +34,8 @@ int main(int argc, char* argv[]) {
         } else {
             output_display("No data available.");
         }
-        ndev_dest();
-        ui_dest();
+        net_dest();
+        output_dest();
         free(buffer);
     }
     

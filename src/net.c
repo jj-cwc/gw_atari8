@@ -3,8 +3,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "errors.h"
 #include "sio.h"
-#include "ndev.h"
+#include "net.h"
 
 // interrupt handler related stuff
 uint8_t trip;
@@ -12,25 +13,22 @@ void *old_vprced; // the old PROCEED vector
 bool old_enabled; // old interrupt state
 extern void ih(); // new interrupt handler
 
-uint16_t bytes_waiting;
 nstatus_t *status;
 
-bool ndev_init() {
+uint8_t net_init() {
     uint8_t err;
-    
-    bytes_waiting = 0;
     
     // allocate a status buffer
     status = (nstatus_t *)malloc(sizeof(nstatus_t));
     if(!status) {
-        return false;
+        return OUT_OF_MEMORY_ERROR;
     }
     
     // check status of FujiNet
-    err = nstatus(status);
+    err = net_status(status);
     if(err != 1) {
         free(status);
-        return false;
+        return FUJINET_STATUS_ERROR;
     }
     
     // set up PROCEED interrupt handler
@@ -40,17 +38,17 @@ bool ndev_init() {
     OS.vprced   = ih;
     PIA.pactl  |= 1;
     
-    err = nopen(GW_URL, 12, 3);
+    err = net_open(GW_URL, 12, 3);
     if(err != 1) {
-        ndev_dest();
-        return false;
+        net_dest();
+        return FUJINET_OPEN_ERROR;
     }
     
-    return true;
+    return SUCCESS;
 }
 
-void ndev_dest() {
-    nclose();
+void net_dest() {
+    net_close();
     free(status);
     PIA.pactl &= ~1;
     OS.vprced=old_vprced; 
@@ -65,12 +63,12 @@ bool data_available() {
     return (trip!=0);
 }
 
-void nreset() {
+void net_reset() {
     trip=0;
     PIA.pactl |= 1;
 }
 
-uint8_t nstatus(nstatus_t *status) {
+uint8_t net_status(nstatus_t *status) {
     OS.dcb.ddevic = 0x71;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 'S';
@@ -88,7 +86,7 @@ uint8_t nstatus(nstatus_t *status) {
     return OS.dcb.dstats;
 }
 
-uint8_t nopen(char *filespec, uint8_t mode, uint8_t translation) {
+uint8_t net_open(char *filespec, uint8_t mode, uint8_t translation) {
 	unsigned char err = 0;
 	
     OS.dcb.ddevic = 0x71;
@@ -104,13 +102,13 @@ uint8_t nopen(char *filespec, uint8_t mode, uint8_t translation) {
 	
     err = OS.dcb.dstats;
     if (err==144) {
-        nstatus(status);
+        net_status(status);
         err = status->error;
     }
 	return err;
 }
 
-uint8_t nclose() {
+uint8_t net_close() {
     OS.dcb.ddevic = 0x71;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 'S';
@@ -125,7 +123,7 @@ uint8_t nclose() {
     return OS.dcb.dstats;
 }
 
-uint8_t nread(char *buf, uint16_t len) {
+uint8_t net_read(char *buf, uint16_t len) {
     OS.dcb.ddevic = 0x71;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 'R';
@@ -136,10 +134,12 @@ uint8_t nread(char *buf, uint16_t len) {
     OS.dcb.daux = len;
     siov();
     
+    net_reset();
+    
     return OS.dcb.dstats;
 }
 
-uint8_t nwrite(char *buf, uint16_t len) {
+uint8_t net_write(char *buf, uint16_t len) {
     OS.dcb.ddevic = 0x71;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 'W';
