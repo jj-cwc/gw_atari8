@@ -37,7 +37,6 @@ uint8_t output_init() {
  */
 void output_dest() {
     ostatus_dest();
-    output_dest();
 }
 
 /* clear the output area
@@ -112,6 +111,7 @@ uint8_t ostatus_init() {
     }
     revers(0);
     restore_cursor();
+    return SUCCESS;
 }
 
 /* clean up when done with output area's status bar

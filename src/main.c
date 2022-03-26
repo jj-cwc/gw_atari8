@@ -6,12 +6,14 @@
 #include "errors.h"
 #include "net.h"
 #include "output.h"
+#include "pstatus.h"
 
 int main(int argc, char* argv[]) {
     uint8_t err;
     char *buffer = (char *)malloc(1024);
     
     output_init();
+    pstatus_init();
 	if(net_init() != SUCCESS) {
         output_display("FujiNet init error.\n");
     } else {

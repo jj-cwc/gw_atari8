@@ -2,6 +2,7 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include "errors.h"
 #include "cursor.h"
 #include "pstatus.h"
 
@@ -16,6 +17,7 @@ uint8_t pstatus_init() {
     }
     revers(0);
     restore_cursor();
+    return SUCCESS;
 }
 
 void pstatus_dest() {
