@@ -30,7 +30,7 @@ uint8_t output_init() {
     cursor_y = UPPER_MARGIN;
     err = ostatus_init();
     if(err) return err;
-    return SUCCESS;
+    return NO_ERROR;
 }
 
 /* clean up when done with output area
@@ -60,6 +60,11 @@ void output_clear() {
 void output_display(char *text) {
     uint8_t i;
     //uint16_t delay;
+    char *start = text;
+    
+    while(start[0] == 0xFF) {
+        start += 3;
+    }
     
     save_cursor();
     gotoxy(cursor_x, cursor_y);
@@ -69,8 +74,8 @@ void output_display(char *text) {
     }
     
     gotoxy(cursor_x, cursor_y);
-    for(i=0; i<strlen(text); i++) {
-        if(text[i] == 0x9B) {
+    for(i=0; i<strlen(start); i++) {
+        if(start[i] == 0x9B) {
             cursor_x = LEFT_MARGIN;
             cursor_y++;
             if(cursor_y > LOWER_MARGIN) {
@@ -78,7 +83,7 @@ void output_display(char *text) {
             }
             gotoxy(cursor_x, cursor_y);
         } else {
-            cputc(text[i]);
+            cputc(start[i]);
             cursor_x++;
             if(cursor_x > LEFT_MARGIN+OUTPUT_WIDTH) {
                 cursor_x = LEFT_MARGIN+OUTPUT_WIDTH;
@@ -111,7 +116,7 @@ uint8_t ostatus_init() {
     }
     revers(0);
     restore_cursor();
-    return SUCCESS;
+    return NO_ERROR;
 }
 
 /* clean up when done with output area's status bar
