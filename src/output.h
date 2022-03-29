@@ -19,5 +19,6 @@ void output_done();
  */
 uint8_t ostatus_init();
 void ostatus_dest();
+void ostatus_more(bool more);
 
 #endif

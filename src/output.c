@@ -79,14 +79,18 @@ void output_display(char *text) {
             cursor_x = LEFT_MARGIN;
             cursor_y++;
             if(cursor_y > LOWER_MARGIN) {
-                cursor_y = LOWER_MARGIN;
+                //cursor_y = LOWER_MARGIN;
+                ostatus_more(true);
+                cgetc();
+                ostatus_more(false);
+                output_clear();
             }
             gotoxy(cursor_x, cursor_y);
         } else {
             cputc(start[i]);
             cursor_x++;
-            if(cursor_x > LEFT_MARGIN+OUTPUT_WIDTH) {
-                cursor_x = LEFT_MARGIN+OUTPUT_WIDTH;
+            if(cursor_x > LEFT_MARGIN+OUTPUT_WIDTH-1) {
+                cursor_x = LEFT_MARGIN+OUTPUT_WIDTH-1;
                 gotox(cursor_x);
             }
         }
@@ -123,4 +127,13 @@ uint8_t ostatus_init() {
  */
 
 void ostatus_dest() {
+}
+
+void ostatus_more(bool more) {
+    save_cursor();
+    revers(1);
+    gotoxy(4,OUTPUT_STATUS);
+    cputs(more?"--More--":"        ");
+    revers(0);
+    restore_cursor();
 }
