@@ -58,7 +58,7 @@ void output_clear() {
  */
 
 void output_display(char *text) {
-    uint8_t i;
+    uint16_t i;
     //uint16_t delay;
     char *start = text;
     
@@ -67,19 +67,20 @@ void output_display(char *text) {
     }
     
     save_cursor();
-    gotoxy(cursor_x, cursor_y);
     if(done) {
         output_clear();
         done = false;
     }
-    
+    gotoxy(30, OUTPUT_STATUS);
+    revers(1);
+    cprintf("%04d", strlen(start));
+    revers(0);
     gotoxy(cursor_x, cursor_y);
     for(i=0; i<strlen(start); i++) {
         if(start[i] == 0x9B) {
             cursor_x = LEFT_MARGIN;
             cursor_y++;
             if(cursor_y > LOWER_MARGIN) {
-                //cursor_y = LOWER_MARGIN;
                 ostatus_more(true);
                 cgetc();
                 ostatus_more(false);

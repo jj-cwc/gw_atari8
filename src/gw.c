@@ -137,6 +137,8 @@ void gw_loop() {
                 continue;
             }
             readbuf[bytes_waiting] = '\0';
+            pset_net_mode(' ');
+            pstatus_display();
             output_display(readbuf);
 
             pset_net_mode(' ');
